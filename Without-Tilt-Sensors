@@ -1,0 +1,84 @@
+const int buzzerPin = 10; //το pin στο οποίο είναι συνδεδεμένος ο βομβητής (buzzer)
+const int ledOnePin = 9; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το πρώτο καπάκι
+const int ledTwoPin = 7; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το δεύτερο καπάκι
+
+const unsigned long INTERVAL = 5000; //Ο χρόνος που μεσολαβεί μεταξύ τη λήψη δύο δοσολογιών των φαρμάκων
+unsigned long previousTime = 0; //Η χρονική στιγμή όπου έγινε η λήψη του προηγούμενου φαρμάκου
+boolean buzzerRinging = false; //μεταβλητή που αντιπροσωπεύει εάν ο βομβητής χτυπάει ή όχι
+
+int kapaki = 1; //Το καπάκι που πρέπει να ανοιχτεί από το χρήστη
+int distance1 = sensor1.getDistance();
+int distance2 = sensor2.getDistance();
+
+void setup() {
+  //Θέσε τα pin ως εξόδους και εισόδους αντίστοιχα
+  pinMode(ledOnePin, OUTPUT);
+  pinMode(ledTwoPin, OUTPUT);
+  tone(buzzerPin, 1000, 20); //ένας σύντομος χαρακτηριστικός ήχος ώστε να ξέρουμε πότε ξεκινάει το πρόγραμμά μας
+}
+/*--------------------- */
+
+void loop() {
+  //Αποθήκευσε την τωρινή χρονική στιγμή (σε μιλλισεκόντ) στη μεταβλητή με όνομα currentTime τύπου unsigned long 
+  unsigned long currentTime = millis();
+  //ΑΝ το currentTime είναι ΜΕΓΑΛΥΤΕΡΟ Ή ΊΣΟ του previousTime + INTERVAL, είναι ώρα να ανοίξουμε κάποιο καπάκι
+  if (currentTime >= previousTime + INTERVAL){
+    //ΑΝ η μεταβλητή kapaki είναι ίση με το 1 (δλδ εάν πρέπει να ανοίξουμε το πρώτο καπάκι)
+    if (kapaki == 1){
+      //Άναψε το πρώτο λαμπάκι στο pin ledOnePin, ώστε να δείξεις στο χρήστη ποιο καπάκι πρέπει να ανοιξει
+      digitalWrite(ledOnePin, HIGH);
+    }
+    //ΑΝ η μεταβλητή kapaki είναι ίση με το 2 (δλδ εάν πρέπει να ανοίξουμε το δεύτερο καπάκι)
+    if (kapaki == 2){
+      //Άναψε το δεύτερο λαμπάκι στο pin ledTwoPin, ώστε να δείξεις στο χρήστη ποιο καπάκι πρέπει να ανοιξει
+      digitalWrite(ledTwoPin, HIGH);
+    }
+    
+    /* ΜΗΝ ΑΛΛΑΞΕΤΕ ΤΗΝ ΠΑΡΑΚΑΤΩ ΓΡΑΜΜΗ ΚΩΔΙΚΑ */
+    //Ξεκίνα να παράγεις ήχο συχνότητας 1000 Hz με τον βομβητή στον ακροδέκτη buzzerPin
+    tone(buzzerPin,1000);
+    /* ----- */
+    //αποθήκευσε στη μεταβλητή buzzerRinging την τιμή true, ώστε να δείξουμε ότι ο βομβητής έχει αρχίσει να χτυπάει, άρα είναι ώρα για τον χρήστη να ανοίξει το καπάκι
+    buzzerRinging = true;
+    //Αποθήκευσε στη μεταβλητή previousTime τη μεταβλητή currentTime
+    previousTime = currentTime;
+  }
+  //ΑΝ η μεταβλτή buzzerRinging είναι true, δηλαδή χτυπάει ο βομβητής (πρέπει να αρχίσουμε να ελέγχουμε κάποιος έχει ανοίξει τα καπάκια)
+  if (buzzerRinging == true){
+    //Αποθήκευσε σε μια (καινούρια/τοπική) μεταβλητή τύπου int με όνομα currentState την τιμή 0 (δηλαδή αρχικοποιούμε μια μεταβλητή)
+    int currentState = 0;
+    //ΑΝ η μεταβλητή kapaki ισούται με 1
+    if (kapaki == 1){
+      //ΔΙΑΒΑΣΕ (με την εντολή digitalRead) το σήμα από τον ακροδέκτη tiltOnePin και αποθήκευσέ το στη μεταβλητή currentState
+      currentState1 = distance1;
+    }
+    //ΑΝ η μεταβλητή kapaki ισούται με 2
+    if (kapaki == 2){
+      //ΔΙΑΒΑΣΕ (με την εντολή digitalRead) το σήμα από τον ακροδέκτη tiltTwoPin και αποθήκευσέ το στη μεταβλητή currentState
+      currentState2 = distance2);
+    }
+    }
+    //ΑΝ η μεταβλητή currentState είναι ΔΙΑΦΟΡΕΤΙΚΗ (!=) από τη μεταβλητή tiltSensorState (δηλαδή εάν το tilt sensor έχει κουνηθεί απ' τη στιγμή που άρχισε ο βομβητής να χτυπάει)
+    if (currentState1 != 0){
+      //Κλείσε το λαμπάκι στον ακροδέκτη ledOnePin
+      digitalWrite(ledOnePin, LOW);
+    
+      if (currentState2 != 0){
+      //Κλείσε το λαμπάκι στον ακροδέκτη ledTwoPin
+      digitalWrite(ledTwoPin, LOW);
+      /* ΜΗΝ ΑΛΛΑΞΕΤΕ ΤΟΝ ΠΑΡΑΚΑΤΩ ΚΩΔΙΚΑ */
+      //Σταμάτα τον ήχο στο βομβητή, αφού το καπάκι έχει ανοίξει
+      noTone(buzzerPin);
+      /* ----- */
+      //Αποθήκευσε στη μεταβλητή buzzerRinging την τιμή false, ώστε να δείξουμε ότι ο βομβητής έχει σταματήσει να χτυπάει, άρα ο χρήστης έχει ανοίξει το καπάκι
+      buzzerRinging = false;
+      //Αύξησε την τιμή της μεταβλητής kapaki κατά ένα. Δηλαδή η μεταβλητή kapaki να γίνει ότι ήταν πριν συν 1.
+      kapaki = kapaki + 1;
+      //ΑΝ το kapaki είναι μεγαλύτερο από το 26 (προς το παρόν έχουμε μόνο τρία καπάκια)
+      if (kapaki >= 2){
+        //Αποθήκευσε στη μεταβλητή kapaki την τιμή 1 (δηλαδή να ξεκινήσει από την αρχή)
+        kapaki = 1;
+      }
+    }
+  }
+}
