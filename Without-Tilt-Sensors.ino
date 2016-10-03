@@ -1,8 +1,8 @@
 #include <Smartcar.h>
 
-const int buzzerPin = 10; //το pin στο οποίο είναι συνδεδεμένος ο βομβητής (buzzer)
-const int ledOnePin = 9; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το πρώτο καπάκι
-const int ledTwoPin = 7; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το δεύτερο καπάκι
+const int buzzerPin = 13; //το pin στο οποίο είναι συνδεδεμένος ο βομβητής (buzzer)
+const int ledOnePin = 12; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το πρώτο καπάκι
+const int ledTwoPin = 11; //το pin στο οποίο είναι συνδεδεμένο το λαμπάκι για το δεύτερο καπάκι
 
 const unsigned long INTERVAL = 5000; //Ο χρόνος που μεσολαβεί μεταξύ τη λήψη δύο δοσολογιών των φαρμάκων
 unsigned long previousTime = 0; //Η χρονική στιγμή όπου έγινε η λήψη του προηγούμενου φαρμάκου
@@ -11,8 +11,8 @@ boolean buzzerRinging = false; //μεταβλητή που αντιπροσωπ�
 SR04 sensor1, sensor2; //dilwse tis metavlites sonarLeft, sonarRight kai sonarFront pou antiproswpevoun tous iperixous
 
 int kapaki = 1; //Το καπάκι που πρέπει να ανοιχτεί από το χρήστη
-int distance1 = sensor1.getDistance();
-int distance2 = sensor2.getDistance();
+int distance1 = 0;
+int distance2 = 0;
 const int SENSOR_1_TRIGGER = 4; //trigger του αριστερού υπέρηχου
 const int SENSOR_1_ECHO = 5; //echo του αριστερού υπέρηχου
 const int SENSOR_2_TRIGGER = A0; //trigger του δεξιού υπέρηχου
@@ -25,23 +25,29 @@ void setup() {
   tone(buzzerPin, 1000, 20); //ένας σύντομος χαρακτηριστικός ήχος ώστε να ξέρουμε πότε ξεκινάει το πρόγραμμά μας
   sensor1.attach(SENSOR_1_TRIGGER, SENSOR_1_ECHO); // αρχικοποίησε τον υπέρηχο στα κατάλληλα pins
   sensor2.attach(SENSOR_2_TRIGGER, SENSOR_2_ECHO);
-
+  Serial.begin(9600);
 }
 /*--------------------- */
 
 void loop() {
+
+
+
   //Αποθήκευσε την τωρινή χρονική στιγμή (σε μιλλισεκόντ) στη μεταβλητή με όνομα currentTime τύπου unsigned long
   unsigned long currentTime = millis();
   //ΑΝ το currentTime είναι ΜΕΓΑΛΥΤΕΡΟ Ή ΊΣΟ του previousTime + INTERVAL, είναι ώρα να ανοίξουμε κάποιο καπάκι
   if (currentTime >= previousTime + INTERVAL) {
+
     //ΑΝ η μεταβλητή kapaki είναι ίση με το 1 (δλδ εάν πρέπει να ανοίξουμε το πρώτο καπάκι)
     if (kapaki == 1) {
       //Άναψε το πρώτο λαμπάκι στο pin ledOnePin, ώστε να δείξεις στο χρήστη ποιο καπάκι πρέπει να ανοιξει
       digitalWrite(ledOnePin, HIGH);
       tone(buzzerPin, 1000);
       buzzerRinging = true;
+      delay(200);
     }
     int currentDistance1 = sensor1.getDistance();
+    /*Serial.println(currentDistance1);*/
     if (distance1 != currentDistance1) {
       digitalWrite(ledOnePin, LOW);
       noTone(buzzerPin);
@@ -55,16 +61,14 @@ void loop() {
       digitalWrite(ledTwoPin, HIGH);
       tone(buzzerPin, 1000);
       buzzerRinging = true;
-      //Αύξησε την τιμή της μεταβλητής kapaki κατά ένα. Δηλαδή η μεταβλητή kapaki να γίνει ότι ήταν πριν συν 1.
-      kapaki = kapaki + 1;
     }
     int currentDistance2 = sensor2.getDistance();
     if (distance2 != currentDistance2) {
+      Serial.println(currentDistance2);
       digitalWrite(ledTwoPin, LOW);
       noTone(buzzerPin);
       buzzerRinging = false;
-      kapaki = kapaki + 1;
-      //ΑΝ το kapaki είναι μεγαλύτερο από το 26 (προς το παρόν έχουμε μόνο τρία καπάκια)
+      //ΑΝ το kapaki είναι μεγαλύτερο από το 2 (προς το παρόν έχουμε μόνο τρία καπάκια)
       if (kapaki >= 2) {
         //Αποθήκευσε στη μεταβλητή kapaki την τιμή 1 (δηλαδή να ξεκινήσει από την αρχή)
         kapaki = 1;
