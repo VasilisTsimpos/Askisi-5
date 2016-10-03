@@ -27,17 +27,12 @@ void setup() {
   sensor2.attach(SENSOR_2_TRIGGER, SENSOR_2_ECHO);
   Serial.begin(9600);
 }
-/*--------------------- */
 
 void loop() {
-
-
-
   //Αποθήκευσε την τωρινή χρονική στιγμή (σε μιλλισεκόντ) στη μεταβλητή με όνομα currentTime τύπου unsigned long
   unsigned long currentTime = millis();
   //ΑΝ το currentTime είναι ΜΕΓΑΛΥΤΕΡΟ Ή ΊΣΟ του previousTime + INTERVAL, είναι ώρα να ανοίξουμε κάποιο καπάκι
   if (currentTime >= previousTime + INTERVAL) {
-
     //ΑΝ η μεταβλητή kapaki είναι ίση με το 1 (δλδ εάν πρέπει να ανοίξουμε το πρώτο καπάκι)
     if (kapaki == 1) {
       //Άναψε το πρώτο λαμπάκι στο pin ledOnePin, ώστε να δείξεις στο χρήστη ποιο καπάκι πρέπει να ανοιξει
